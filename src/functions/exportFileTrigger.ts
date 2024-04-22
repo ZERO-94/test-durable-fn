@@ -17,6 +17,7 @@ import {
 } from "durable-functions";
 import * as fs from "fs";
 import * as JSZip from "jszip";
+import { PassThrough } from "stream";
 
 // "http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;"
 
@@ -74,53 +75,63 @@ const getListOfLos: ActivityHandler = async () => {
     {
       name: "LO1",
       id: 1,
-      fileList: ["large-file.json", "large-file.json", "large-file.json"],
+      fileList: [
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+      ],
     },
     {
       name: "LO2",
       id: 2,
-      fileList: ["large-file.json", "large-file.json"],
+      fileList: [
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+      ],
     },
     {
       name: "LO3",
       id: 3,
       fileList: [
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
-        "large-file.json",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
+        "geographic-units-by-industry-and-statistical-area-2000-2023-descending-order-february-2023.csv",
       ],
     },
   ];
 };
+
+const ONE_MEGABYTE = 1024 * 1024;
+const uploadOptions = { bufferSize: 4 * ONE_MEGABYTE, maxBuffers: 20 };
 
 const exportFileTrigger: ActivityHandler = async (
   props: {
@@ -135,23 +146,43 @@ const exportFileTrigger: ActivityHandler = async (
   const results = await Promise.all(
     props.fileList.map(async (file) => {
       const blobClient = containerClient.getBlobClient(file);
+      console.log(`Downloading ${file}`);
       const downloadBlockBlobResponse = await blobClient.download();
 
       return downloadBlockBlobResponse;
     })
   );
 
+  console.log(`Creating zip file for ${props.loName}`);
+
   const zip = new JSZip();
   const zipName = `${props.loName}-${new Date().toISOString()}.zip`;
   results.forEach((result, index) => {
     zip.file(`file-${index + 1}.json`, result.readableStreamBody);
   });
+
+  // fs.writeFileSync(zipName, await zip.generateAsync({ type: "nodebuffer" }));
+
   const zipFile = await zip.generateNodeStream();
 
+  console.log(`Uploading ${zipName}`);
+
   //store zip file in blob storage
-  const result = await containerClient
+  const uploadPromise = containerClient
     .getBlockBlobClient(zipName)
-    .uploadStream(zipFile as any);
+    .uploadStream(
+      zipFile as any,
+      uploadOptions.bufferSize,
+      uploadOptions.maxBuffers,
+      {
+        blobHTTPHeaders: { blobContentType: "application/zip" },
+        onProgress(progress) {
+          console.log(`Progress - ${props.loName}: ${progress.loadedBytes}`);
+        },
+      }
+    );
+
+  const result = await uploadPromise;
   console.log(JSON.stringify(result._response.status));
 };
 df.app.activity("exportFileTrigger", { handler: exportFileTrigger });
