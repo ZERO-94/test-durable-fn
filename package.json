@@ -12,7 +12,9 @@
   },
   "dependencies": {
     "@azure/functions": "^4.0.0",
-    "durable-functions": "^3.0.0-alpha.5"
+    "@azure/storage-blob": "^12.17.0",
+    "durable-functions": "^3.0.0-alpha.5",
+    "jszip": "^3.10.1"
   },
   "devDependencies": {
     "@types/node": "^18.x",
